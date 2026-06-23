@@ -3,17 +3,24 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const authRoutes = require("./routes/auth");  // 👈 add this
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+app.use("/api/auth", authRoutes);  // 👈 add this
+
 // Test route
 app.get("/", (req, res) => {
   res.json({ message: "Server is running 🚀" });
 });
+app.use((err, req, res, next) => {
+  console.error("ERROR:", err.stack);
+  res.status(500).json({ message: err.message });
+});
 
-// Connect MongoDB and start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
