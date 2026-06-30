@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [total, setTotal] = useState(0);
   const [summary, setSummary] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ title: "", amount: "", category: "Food", date: "", note: "" });
   const [loading, setLoading] = useState(false);
 
@@ -39,20 +40,41 @@ export default function Dashboard() {
     fetchSummary();
   }, []);
 
+  const resetForm = () => {
+    setForm({ title: "", amount: "", category: "Food", date: "", note: "" });
+    setEditingId(null);
+  };
+
   const handleAddExpense = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/expenses", { ...form, amount: parseFloat(form.amount) });
-      setForm({ title: "", amount: "", category: "Food", date: "", note: "" });
+      if (editingId) {
+        await api.put(`/expenses/${editingId}`, { ...form, amount: parseFloat(form.amount) });
+      } else {
+        await api.post("/expenses", { ...form, amount: parseFloat(form.amount) });
+      }
+      resetForm();
       setShowForm(false);
       fetchExpenses();
       fetchSummary();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to add expense");
+      alert(err.response?.data?.message || "Failed to save expense");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditClick = (exp) => {
+    setEditingId(exp._id);
+    setForm({
+      title: exp.title,
+      amount: exp.amount,
+      category: exp.category,
+      date: exp.date.split("T")[0],
+      note: exp.note || "",
+    });
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -107,14 +129,20 @@ export default function Dashboard() {
         <Charts summary={summary} />
 
         {/* Add Expense Button */}
-        <button className="add-btn" onClick={() => setShowForm(!showForm)}>
+        <button
+          className="add-btn"
+          onClick={() => {
+            if (showForm) resetForm();
+            setShowForm(!showForm);
+          }}
+        >
           {showForm ? "✕ Cancel" : "+ Add Expense"}
         </button>
 
-        {/* Add Expense Form */}
+        {/* Add / Edit Expense Form */}
         {showForm && (
           <div className="expense-form-card">
-            <h3>Add New Expense</h3>
+            <h3>{editingId ? "Edit Expense" : "Add New Expense"}</h3>
             <form onSubmit={handleAddExpense} className="expense-form">
               <div className="form-row">
                 <div>
@@ -162,7 +190,7 @@ export default function Dashboard() {
                 />
               </div>
               <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? "Adding..." : "Add Expense"}
+                {loading ? "Saving..." : editingId ? "Update Expense" : "Add Expense"}
               </button>
             </form>
           </div>
@@ -176,25 +204,28 @@ export default function Dashboard() {
               <p>🧾 No expenses yet. Add one above!</p>
             </div>
           ) : (
-            expenses.map((exp) => (
-              <div key={exp._id} className="expense-item">
-                <div className="expense-left">
-                  <span className="expense-emoji">{categoryEmoji(exp.category)}</span>
-                  <div>
-                    <p className="expense-title">{exp.title}</p>
-                    <div className="expense-meta">
-                      <span className={`badge badge-${exp.category}`}>{exp.category}</span>
-                      <span className="expense-date">
-                        {new Date(exp.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="expense-right">
-                  <span className="expense-amount">₹{exp.amount.toLocaleString()}</span>
-                  <button className="delete-btn" onClick={() => handleDelete(exp._id)}>✕</button>
-                </div>
-              </div>
+           expenses.map((exp) => (
+  <div key={exp._id} className="expense-item">
+    <div className="expense-left">
+      <span className="expense-emoji">{categoryEmoji(exp.category)}</span>
+      <div>
+        <p className="expense-title">{exp.title}</p>
+        <div className="expense-meta">
+          <span className={`badge badge-${exp.category}`}>{exp.category}</span>
+          <span className="expense-date">
+            {new Date(exp.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+          </span>
+        </div>
+        {exp.note && <p className="expense-note">{exp.note}</p>}
+      </div>
+    </div>
+    <div className="expense-right">
+      <span className="expense-amount">₹{exp.amount.toLocaleString()}</span>
+      <button className="edit-btn" onClick={() => handleEditClick(exp)}>✎</button>
+      <button className="delete-btn" onClick={() => handleDelete(exp._id)}>✕</button>
+    </div>
+  </div>
+
             ))
           )}
         </div>

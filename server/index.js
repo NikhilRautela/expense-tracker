@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const expenseRoutes = require("./routes/expenses");
+const aiRoutes = require("./routes/ai");
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Server is running 🚀" });
