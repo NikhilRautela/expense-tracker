@@ -36,13 +36,28 @@ router.post("/", async (req, res) => {
   }
 });
 
+// GET /api/expenses/stats/summary - category-wise totals for charts
+router.get("/stats/summary", async (req, res) => {
+  try {
+    const summary = await Expense.aggregate([
+      { $match: { user: req.user._id } },
+      { $group: { _id: "$category", total: { $sum: "$amount" }, count: { $sum: 1 } } },
+      { $sort: { total: -1 } },
+    ]);
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // PUT /api/expenses/:id - update expense
 router.put("/:id", async (req, res) => {
   try {
     const expense = await Expense.findOne({ _id: req.params.id, user: req.user._id });
     if (!expense) return res.status(404).json({ message: "Expense not found" });
 
-    const updated = await Expense.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });cd
+    const updated = await Expense.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

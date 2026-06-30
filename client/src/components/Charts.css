@@ -1,0 +1,29 @@
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  background: #1a1d27;
+  border: 1px solid #2e3250;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.chart-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.charts-empty {
+  background: #1a1d27;
+  border: 1px solid #2e3250;
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #8b90a7;
+  margin-bottom: 24px;
+}

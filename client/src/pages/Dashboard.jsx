@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
+import Charts from "../components/Charts";
 import "./Dashboard.css";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const [expenses, setExpenses] = useState([]);
   const [total, setTotal] = useState(0);
+  const [summary, setSummary] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", amount: "", category: "Food", date: "", note: "" });
   const [loading, setLoading] = useState(false);
@@ -23,8 +25,18 @@ export default function Dashboard() {
     }
   };
 
+  const fetchSummary = async () => {
+    try {
+      const { data } = await api.get("/expenses/stats/summary");
+      setSummary(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchExpenses();
+    fetchSummary();
   }, []);
 
   const handleAddExpense = async (e) => {
@@ -35,6 +47,7 @@ export default function Dashboard() {
       setForm({ title: "", amount: "", category: "Food", date: "", note: "" });
       setShowForm(false);
       fetchExpenses();
+      fetchSummary();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to add expense");
     } finally {
@@ -47,6 +60,7 @@ export default function Dashboard() {
     try {
       await api.delete(`/expenses/${id}`);
       fetchExpenses();
+      fetchSummary();
     } catch (err) {
       alert("Failed to delete");
     }
@@ -88,6 +102,9 @@ export default function Dashboard() {
             </h2>
           </div>
         </div>
+
+        {/* Charts */}
+        <Charts summary={summary} />
 
         {/* Add Expense Button */}
         <button className="add-btn" onClick={() => setShowForm(!showForm)}>
