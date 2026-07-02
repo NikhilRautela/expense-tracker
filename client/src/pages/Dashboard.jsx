@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import Charts from "../components/Charts";
 import "./Dashboard.css";
+import AIExpenseInput from "../components/AIExpenseInput";
+import AIInsights from "../components/AIInsights";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -127,6 +129,11 @@ export default function Dashboard() {
 
         {/* Charts */}
         <Charts summary={summary} />
+
+        {/* AI Expense Input */}
+<AIExpenseInput onExpenseAdded={() => { fetchExpenses(); fetchSummary(); }} />
+
+  <AIInsights />
 
         {/* Add Expense Button */}
         <button

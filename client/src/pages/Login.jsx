@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import "./Login.css";
+import loginBg from "../assets/login-bg.jpg";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -29,29 +30,33 @@ export default function Login() {
   return (
     <div className="login-page">
 
-      {/* Left Panel - Branding */}
-      <div className="login-left">
-        <div className="brand-logo">💸 SpendSense</div>
-        <h1 className="brand-tagline">Track smarter. Spend wiser. Powered by AI.</h1>
-        <p className="brand-desc">
-          SpendSense helps you manage your money effortlessly — log expenses in plain English,
-          get AI-powered insights, and stay on top of your budget every month.
-        </p>
-        <div className="brand-features">
-          <div className="brand-feature">
-            <span className="brand-feature-icon">🤖</span>
-            Natural language expense entry
-          </div>
-          <div className="brand-feature">
-            <span className="brand-feature-icon">📊</span>
-            Visual spending breakdowns
-          </div>
-          <div className="brand-feature">
-            <span className="brand-feature-icon">🧠</span>
-            AI-generated monthly insights
-          </div>
-        </div>
+    {/* Left Panel - Branding */}
+<div className="login-left">
+  <div className="login-left-overlay" />
+<img src={loginBg} alt="SpendSense" className="login-bg-img" />
+  <div className="login-left-content">
+    <div className="brand-logo">💸 SpendSense</div>
+    <h1 className="brand-tagline">Track smarter. Spend wiser. Powered by AI.</h1>
+    <p className="brand-desc">
+      SpendSense helps you manage your money effortlessly — log expenses in plain English,
+      get AI-powered insights, and stay on top of your budget every month.
+    </p>
+    <div className="brand-features">
+      <div className="brand-feature">
+        <span className="brand-feature-icon">🤖</span>
+        Natural language expense entry
       </div>
+      <div className="brand-feature">
+        <span className="brand-feature-icon">📊</span>
+        Visual spending breakdowns
+      </div>
+      <div className="brand-feature">
+        <span className="brand-feature-icon">🧠</span>
+        AI-generated monthly insights
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Right Panel - Form */}
       <div className="login-right">
